@@ -1,0 +1,15 @@
+{
+	"name": "steamsink",
+	"version": "0.1.0",
+	"description": "Steam spending review",
+	"main": "steamsink.js",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/llbit/steamsink.git"
+	},
+	"license": "GPLv3",
+	"dependencies": {
+		"jsdom": ">=0.8.2",
+		"sleep": "*"
+	}
+}
