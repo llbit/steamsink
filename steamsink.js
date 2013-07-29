@@ -1,7 +1,7 @@
 ﻿var http = require('http');
 var fs = require('fs');
 var jsdom = require('jsdom');
-var jquery = fs.readFileSync('./jquery-2.0.3.min.js', 'utf-8');
+var jquery = fs.readFileSync('./jquery.js', 'utf-8');
 
 var account_filename = './account.html';// save https://store.steampowered.com/account/ as account.html
 var app_id = '###';// Open Exchange Rates API ID - don't share this!
