@@ -55,7 +55,6 @@ function addPrice(title, date, price) {
 		currency = 'EUR';
 		val = price.substring(0, price.indexOf('\u20ac'));
 	}
-	// TODO: Exclude wallet credit events? Else it will be counted twice!
 	val = parseFloat(val.replace(/-/g, '0'));
 	if (!isNaN(val)) {
 		getXchg(date, function (xchg) {
@@ -83,7 +82,8 @@ fs.readFile(account_filename, function (err, html) {
 			var $ = window.jQuery;
 			var row = $('#store_transactions .transactionRow');
 			row.each(function (index) {
-				if (!$(this).hasClass('transactionLegend')) {
+				var event = $(this).children('.transactionRowEvent').text();
+				if (event == 'Purchase') {
 					var date = $(this).children('.transactionRowDate').text();
 					var price = $(this).children('.transactionRowPrice').text();
 					var title = $(this).find('.transactionRowTitle').text();
