@@ -2,9 +2,12 @@
 var fs = require('fs');
 var jsdom = require('jsdom');
 var jquery = fs.readFileSync('./jquery.js', 'utf-8');
+var config = require('./config.json');
 
-var account_filename = './account.html';// save https://store.steampowered.com/account/ as account.html
-var app_id = '###';// Open Exchange Rates API ID - don't share this!
+if (!fs.lstatSync('./historical').isDirectory()) {
+	// create directory to store historical exchange rates
+	fs.mkdirSync('./historical');
+}
 
 function datestring(date) {
 	function pad (str) {
@@ -20,8 +23,8 @@ function datestring(date) {
 }
 
 function getXchg(date, callback) {
-	var filename = './'+datestring(date)+'.json';
-	var url = 'http://openexchangerates.org/api/historical/'+datestring(date)+'.json?app_id='+app_id;
+	var filename = './historical/'+datestring(date)+'.json';
+	var url = 'http://openexchangerates.org/api/historical/'+datestring(date)+'.json?app_id='+config.app_id;
 	function done() {
 		json = fs.readFileSync(filename, 'utf-8');
 		callback(JSON.parse(json));
@@ -70,7 +73,7 @@ function addPrice(title, date, price) {
 	}
 }
 
-fs.readFile(account_filename, function (err, html) {
+fs.readFile(config.account_filename, function (err, html) {
 	if (err) {
 		throw err;
 	}

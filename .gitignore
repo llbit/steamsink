@@ -12,3 +12,12 @@ logs
 results
 
 npm-debug.log
+
+# npm
+node_modules
+
+# steamsink
+historical
+config.json
+jquery.js
+*.html

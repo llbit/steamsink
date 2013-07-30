@@ -7,13 +7,16 @@ Prerequisites:
 
 * NodeJS
 * jQuery
-* An Open Exchange Rates account
+* An [Open Exchange Rates](https://openexchangerates.org/) account
 
 Do this:
 
 1. Place jquery.js in the steamsink directory
-2. Download the page at https://store.steampowered.com/account/ and save as `account.html`
-3. Edit steamsink.js and set your API ID (https://openexchangerates.org/)
-4. Change the currencies if needed
+2. Download HTML page at https://store.steampowered.com/account/
+3. Create a config.json that points to the downloaded HTML file and includes
+your APP ID for Open Exchange Rates:
+        { "account_filename": "./account.html",
+          "app_id": "secret - do not share!" }
+4. Change the currency calculations if you are not interested in SEK output
 5. `$ npm install`
 6. `$ node steamsink.js`
