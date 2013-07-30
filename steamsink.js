@@ -93,7 +93,7 @@ fs.readFile(config.account_filename, function (err, html) {
 					addPrice(title, new Date(date), price);
 				}
 			});
-			// done
+			// TODO: this can happen before all prices are fetched - need to fix this!
 			console.log('sum = ' + sum + ' SEK');
 		}
 	});
