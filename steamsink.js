@@ -55,6 +55,7 @@ function addPrice(title, date, price) {
 		currency = 'EUR';
 		val = price.substring(0, price.indexOf('\u20ac'));
 	}
+	// TODO: Exclude wallet credit events? Else it will be counted twice!
 	val = parseFloat(val.replace(/-/g, '0'));
 	if (!isNaN(val)) {
 		getXchg(date, function (xchg) {
