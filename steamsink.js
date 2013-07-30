@@ -80,13 +80,12 @@ fs.readFile(account_filename, function (err, html) {
 		src: [jquery],
 		done: function (errors, window) {
 			var $ = window.jQuery;
-			fs.writeFile('errors.log', errors);
-			var dates = window.$('#store_transactions .transactionRowDate');
-			dates.each(function (index) {
-				if (!$(this).parent().hasClass('transactionLegend')) {
-					var date = $(this).text();
-					var price = $(this).parent().children('.transactionRowPrice').text();
-					var title = $(this).parent().find('.transactionRowTitle').text();
+			var row = $('#store_transactions .transactionRow');
+			row.each(function (index) {
+				if (!$(this).hasClass('transactionLegend')) {
+					var date = $(this).children('.transactionRowDate').text();
+					var price = $(this).children('.transactionRowPrice').text();
+					var title = $(this).find('.transactionRowTitle').text();
 					addPrice(title, new Date(date), price);
 				}
 			});
