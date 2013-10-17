@@ -1,15 +1,21 @@
 {
-	"name": "steamsink",
-	"version": "0.1.0",
-	"description": "Steam spending review",
-	"main": "steamsink.js",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/llbit/steamsink.git"
-	},
-	"license": "GPLv3",
-	"dependencies": {
-		"jsdom": ">=0.8.2",
-		"sleep": "*"
-	}
+  "name": "steamsink",
+  "version": "0.1.1",
+  "description": "Steam spending review",
+  "main": "steamsink.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/llbit/steamsink.git"
+  },
+  "license": "GPLv3",
+  "dependencies": {
+    "jsdom": ">=0.8.2",
+    "sleep": "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "author": "Jesper Öqvist <jesper@llbit.se> (http://llbit.se)"
 }

@@ -1,11 +1,9 @@
 ﻿var http = require('http');
 var fs = require('fs');
 var jsdom = require('jsdom');
-var jquery = fs.readFileSync('./jquery.js', 'utf-8');
 var config = require('./config.json');
 
-if (!fs.lstatSync('./historical').isDirectory()) {
-	// create directory to store historical exchange rates
+if (!fs.existsSync('./historical')) {
 	fs.mkdirSync('./historical');
 }
 
@@ -24,7 +22,6 @@ function datestring(date) {
 
 function getXchg(date, callback) {
 	var filename = './historical/'+datestring(date)+'.json';
-	var url = 'http://openexchangerates.org/api/historical/'+datestring(date)+'.json?app_id='+config.app_id;
 	function done() {
 		json = fs.readFileSync(filename, 'utf-8');
 		callback(JSON.parse(json));
@@ -33,22 +30,25 @@ function getXchg(date, callback) {
 		done();
 	} catch (e) {
 		//console.log('downloading ' + url);
+		var url = 'http://openexchangerates.org/api/historical/'+datestring(date)+'.json?app_id='+config.app_id;
 		var file = fs.createWriteStream(filename);
+		file.on('finish', function() {
+			file.close();
+			done();
+		});
+		// TODO could create multiple asynchronous requests here, should only spawn one request per date
 		var request = http.get(url, function(response) {
 			response.pipe(file);
-			file.on('finish', function() {
-				file.close();
-				done();
-			});
 		}).on('error', function(e) {
-			console.log("http error: " + e.message);
+			console.log('http error: ' + e.message);
+			process.exit(1);
 		});
 	}
 }
 
 var sum = 0;
 
-function addPrice(title, date, price) {
+function addPrice(title, date, price, sum) {
 	var currency = '???';
 	var val = price;
 	if (price.indexOf('$') !== -1) {
@@ -68,33 +68,59 @@ function addPrice(title, date, price) {
 			console.log(title);
 			console.log(val + ' ' + currency + ' = ' + sek + ' SEK');
 			console.log();
-			sum += sek;
+			sum(sek);
 		});
 	}
 }
 
-fs.readFile(config.account_filename, function (err, html) {
-	if (err) {
-		throw err;
-	}
-	jsdom.env({
-		html: html,
-		encoding: 'binary',
-		src: [jquery],
-		done: function (errors, window) {
-			var $ = window.jQuery;
-			var row = $('#store_transactions .transactionRow');
-			row.each(function (index) {
-				var event = $(this).children('.transactionRowEvent').text();
-				if (event == 'Purchase') {
-					var date = $(this).children('.transactionRowDate').text();
-					var price = $(this).children('.transactionRowPrice').text();
-					var title = $(this).find('.transactionRowTitle').text();
-					addPrice(title, new Date(date), price);
-				}
-			});
-			// TODO: this can happen before all prices are fetched - need to fix this!
-			console.log('sum = ' + sum + ' SEK');
+function readTransactions() {
+	fs.readFile(config.account_filename, function (err, html) {
+		if (err) {
+			throw err;
 		}
+		var jquery = fs.readFileSync('./jquery.js', 'utf-8');
+		jsdom.env({
+			html: html,
+			encoding: 'binary',
+			src: [jquery],
+			done: function (errors, window) {
+				var $ = window.jQuery;
+				var rows = $('#store_transactions .transactionRow');
+				var numrows = rows.length;
+				rows.each(function (index) {
+					var event = $(this).children('.transactionRowEvent').text();
+					if (event == 'Purchase') {
+						var date = $(this).children('.transactionRowDate').text();
+						var price = $(this).children('.transactionRowPrice').text();
+						var title = $(this).find('.transactionRowTitle').text();
+						addPrice(title, new Date(date), price, function (sek) {
+							sum += sek;
+							if ((index + 1) === numrows) {
+								console.log('sum = ' + sum + ' SEK');
+							}
+						});
+					}
+				});
+			}
+		});
 	});
-});
+}
+
+if (!fs.existsSync('./jquery.js')) {
+	console.log('downloading jquery.js');
+	var file = fs.createWriteStream('./jquery.js');
+	file.on('finish', function() {
+		file.close();
+		readTransactions();
+	});
+	var request = http.get('http://code.jquery.com/jquery.js', function(response) {
+		response.pipe(file);
+	}).on('error', function(e) {
+		console.log('http error: ' + e.message);
+		process.exit(1);
+	});
+} else {
+	readTransactions();
+}
+
+
